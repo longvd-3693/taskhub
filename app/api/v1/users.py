@@ -1,4 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    status
+)
+
 from app.dependencies import get_user_service
 from app.schemas.user import (
     UserCreate,
@@ -16,13 +22,14 @@ router = APIRouter(
 
 @router.post(
     "",
-    response_model=UserResponse
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED
 )
-def create_user(
+async def create_user(
     request: UserCreate,
     service: UserService = Depends(get_user_service)
 ):
-    return service.create_user(
+    return await service.create_user(
         request.model_dump()
     )
 
@@ -31,21 +38,26 @@ def create_user(
     "",
     response_model=list[UserResponse]
 )
-def get_users(
+async def get_users(
+    page: int = 1,
+    limit: int = 20,
     service: UserService = Depends(get_user_service)
 ):
-    return service.get_users()
+    return await service.get_users(
+        page=page,
+        limit=limit
+    )
 
 
 @router.get(
     "/{user_id}",
     response_model=UserResponse
 )
-def get_user(
+async def get_user(
     user_id: int,
     service: UserService = Depends(get_user_service)
 ):
-    user = service.get_user(user_id)
+    user = await service.get_user(user_id)
 
     if user is None:
         raise HTTPException(
@@ -60,12 +72,12 @@ def get_user(
     "/{user_id}",
     response_model=UserResponse
 )
-def update_user(
+async def update_user(
     user_id: int,
     request: UserUpdate,
     service: UserService = Depends(get_user_service)
 ):
-    user = service.update_user(
+    user = await service.update_user(
         user_id,
         request.model_dump(
             exclude_none=True
@@ -82,20 +94,21 @@ def update_user(
 
 
 @router.delete(
-    "/{user_id}"
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_user(
+async def delete_user(
     user_id: int,
     service: UserService = Depends(get_user_service)
 ):
-    deleted = service.delete_user(user_id)
+    success = await service.delete_user(
+        user_id
+    )
 
-    if not deleted:
+    if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found"
         )
 
-    return {
-        "success": True
-    }
+    return None

@@ -9,25 +9,52 @@ class UserService:
     ):
         self.repository = repository
 
+    async def create_user(
+        self,
+        data: dict
+    ):
+        return await self.repository.create(data)
 
-    def create_user(self, user_data: dict):
-        return self.repository.create(user_data)
-
-
-    def get_users(self):
-        return self.repository.get_all()
-
-
-    def get_user(self, user_id: int):
-        return self.repository.get_by_id(user_id)
-
-
-    def update_user(self, user_id: int, user_data: dict):
-        return self.repository.update(
-            user_id,
-            user_data
+    async def get_users(
+        self,
+        page: int = 1,
+        limit: int = 20
+    ):
+        return await self.repository.paginate(
+            page=page,
+            limit=limit
         )
 
+    async def get_user(
+        self,
+        user_id: int
+    ):
+        return await self.repository.get_by_id(user_id)
 
-    def delete_user(self, user_id: int):
-        return self.repository.delete(user_id)
+    async def update_user(
+        self,
+        user_id: int,
+        data: dict
+    ):
+        user = await self.repository.get_by_id(user_id)
+
+        if user is None:
+            return None
+
+        return await self.repository.update(
+            user,
+            data
+        )
+
+    async def delete_user(
+        self,
+        user_id: int
+    ):
+        user = await self.repository.get_by_id(user_id)
+
+        if user is None:
+            return False
+
+        await self.repository.delete(user)
+
+        return True
