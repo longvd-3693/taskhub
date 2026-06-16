@@ -12,6 +12,8 @@ from app.schemas.user import (
     UserResponse
 )
 from app.services.user import UserService
+from app.auth.dependencies import get_current_user
+from app.models.user import User
 
 
 router = APIRouter(
@@ -47,6 +49,16 @@ async def get_users(
         page=page,
         limit=limit
     )
+
+
+@router.get(
+    "/me",
+    response_model=UserResponse,
+)
+async def get_me(
+    current_user: User = Depends(get_current_user),
+):
+    return current_user
 
 
 @router.get(
