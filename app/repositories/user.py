@@ -1,52 +1,12 @@
-class UserRepository:
+from sqlalchemy.ext.asyncio import AsyncSession
 
-    def __init__(self):
-        self.users = []
-        self.next_id = 1
-
-
-    def create(self, user_data: dict):
-        user = {
-            "id": self.next_id,
-            **user_data
-        }
-
-        self.next_id += 1
-
-        self.users.append(user)
-
-        return user
+from app.models.user import User
+from app.repositories.base import BaseRepository
 
 
-    def get_all(self):
-        return list(self.users)
+class UserRepository(BaseRepository[User]):
+    def __init__(self, session: AsyncSession):
+        super().__init__(session, User)
 
-
-    def get_by_id(self, user_id: int):
-        for user in self.users:
-            if user["id"] == user_id:
-                return user
-
-        return None
-
-
-    def update(self, user_id: int, user_data: dict):
-        user = self.get_by_id(user_id)
-
-        if not user:
-            return None
-
-        user.update(user_data)
-
-        return user
-
-
-    def delete(self, user_id: int):
-        user = self.get_by_id(user_id)
-
-        if not user:
-            return False
-
-        self.users.remove(user)
-
-        return True
+    async def get_by_email(self, email: str):
+        return await self.find_one(email=email)

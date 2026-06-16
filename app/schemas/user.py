@@ -4,6 +4,7 @@ from pydantic import BaseModel, EmailStr
 class UserCreate(BaseModel):
     email: EmailStr
     full_name: str
+    hashed_password: str
 
 
 class UserUpdate(BaseModel):

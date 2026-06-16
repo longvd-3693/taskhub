@@ -1,9 +1,60 @@
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.database import get_db
 from app.repositories.user import UserRepository
 from app.services.user import UserService
+from app.repositories.workspace import WorkspaceRepository
+from app.services.workspace import WorkspaceService
+from app.repositories.project import ProjectRepository
+from app.repositories.task import TaskRepository
+from app.services.project import ProjectService
+from app.services.task import TaskService
 
 
-user_repository = UserRepository()
+def get_user_repository(
+    db: AsyncSession = Depends(get_db)
+):
+    return UserRepository(db)
 
 
-def get_user_service():
-    return UserService(user_repository)
+def get_user_service(
+    repository: UserRepository = Depends(get_user_repository)
+):
+    return UserService(repository)
+
+
+def get_workspace_repository(
+    db: AsyncSession = Depends(get_db),
+):
+    return WorkspaceRepository(db)
+
+
+def get_workspace_service(
+    repository: WorkspaceRepository = Depends(get_workspace_repository),
+):
+    return WorkspaceService(repository)
+
+
+def get_project_repository(
+    db: AsyncSession = Depends(get_db),
+):
+    return ProjectRepository(db)
+
+
+def get_project_service(
+    repository: ProjectRepository = Depends(get_project_repository),
+):
+    return ProjectService(repository)
+
+
+def get_task_repository(
+    db: AsyncSession = Depends(get_db),
+):
+    return TaskRepository(db)
+
+
+def get_task_service(
+    repository: TaskRepository = Depends(get_task_repository),
+):
+    return TaskService(repository)
