@@ -2,12 +2,12 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
+from app.models.enums import ProjectStatus
+
 
 class ProjectCreate(BaseModel):
-    workspace_id: int
     name: str
     description: str | None = None
-    status: str = "ACTIVE"
 
 
 class ProjectUpdate(BaseModel):
@@ -21,7 +21,7 @@ class ProjectResponse(BaseModel):
     workspace_id: int
     name: str
     description: str | None
-    status: str
+    status: ProjectStatus
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)

@@ -1,5 +1,7 @@
 from datetime import timezone
 
+from app.models.enums import TaskStatus
+from app.models.task import Task
 from app.repositories.task import TaskRepository
 
 
@@ -16,31 +18,48 @@ class TaskService:
 
         return data
 
-    async def create_task(self, data: dict):
+    async def create_task(
+        self,
+        project_id: int,
+        created_by: int,
+        data: dict,
+    ):
         data = self._normalize_datetime(data)
+        data["project_id"] = project_id
+        data["created_by"] = created_by
+        data["status"] = TaskStatus.TODO
+
         return await self.repository.create(data)
 
-    async def get_tasks(self, page: int = 1, limit: int = 20):
-        return await self.repository.paginate(page=page, limit=limit)
+    async def get_project_tasks(
+        self,
+        project_id: int,
+        page: int = 1,
+        limit: int = 20,
+    ):
+        return await self.repository.get_by_project(
+            project_id=project_id,
+            page=page,
+            limit=limit,
+        )
 
-    async def get_task(self, task_id: int):
-        return await self.repository.get_by_id(task_id)
+    async def get_task_with_project_workspace(
+        self,
+        task_id: int,
+    ):
+        return await self.repository.get_by_id_with_project_workspace(task_id)
 
-    async def update_task(self, task_id: int, data: dict):
-        task = await self.repository.get_by_id(task_id)
-
-        if task is None:
-            return None
-
+    async def update_task(
+        self,
+        task: Task,
+        data: dict,
+    ):
         data = self._normalize_datetime(data)
-
         return await self.repository.update(task, data)
 
-    async def delete_task(self, task_id: int):
-        task = await self.repository.get_by_id(task_id)
-
-        if task is None:
-            return False
-
+    async def delete_task(
+        self,
+        task: Task,
+    ):
         await self.repository.delete(task)
         return True

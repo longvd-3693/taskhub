@@ -5,6 +5,7 @@ from app.auth.jwt import decode_token
 from app.dependencies import get_user_service
 from app.models.user import User
 from app.services.user import UserService
+from app.models.enums import UserRole
 
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -47,3 +48,26 @@ async def get_current_user(
         )
 
     return user
+
+async def get_current_active_user(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Inactive user",
+        )
+
+    return current_user
+
+
+async def require_admin(
+    current_user: User = Depends(get_current_active_user),
+) -> User:
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin permission required",
+        )
+
+    return current_user

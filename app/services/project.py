@@ -1,3 +1,5 @@
+from app.models.enums import ProjectStatus
+from app.models.project import Project
 from app.repositories.project import ProjectRepository
 
 
@@ -6,24 +8,49 @@ class ProjectService:
     def __init__(self, repository: ProjectRepository):
         self.repository = repository
 
-    async def create_project(self, data: dict):
+    async def create_project(
+        self,
+        workspace_id: int,
+        data: dict,
+    ):
+        data["workspace_id"] = workspace_id
+        data["status"] = ProjectStatus.ACTIVE
+
         return await self.repository.create(data)
 
-    async def get_projects(self, page: int = 1, limit: int = 20):
-        return await self.repository.paginate(page=page, limit=limit)
-
-    async def get_project(self, project_id: int):
+    async def get_project(
+        self,
+        project_id: int,
+    ):
         return await self.repository.get_by_id(project_id)
 
-    async def update_project(self, project_id: int, data: dict):
-        project = await self.repository.get_by_id(project_id)
-        if project is None:
-            return None
+    async def get_project_with_workspace(
+        self,
+        project_id: int,
+    ):
+        return await self.repository.get_by_id_with_workspace(project_id)
+
+    async def update_project(
+        self,
+        project: Project,
+        data: dict,
+    ):
         return await self.repository.update(project, data)
 
-    async def delete_project(self, project_id: int):
-        project = await self.repository.get_by_id(project_id)
-        if project is None:
-            return False
+    async def archive_project(
+        self,
+        project: Project,
+    ):
+        return await self.repository.update(
+            project,
+            {
+                "status": ProjectStatus.ARCHIVED,
+            },
+        )
+
+    async def delete_project(
+        self,
+        project: Project,
+    ):
         await self.repository.delete(project)
         return True
