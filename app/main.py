@@ -5,6 +5,7 @@ from app.core.lifespan import lifespan
 from app.api.v1.workspaces import router as workspace_router
 from app.api.v1.projects import router as project_router
 from app.api.v1.tasks import router as task_router
+from app.api.v1.auth import router as auth_router
 
 app = FastAPI(
     title="TaskHub API",
@@ -32,6 +33,10 @@ app.include_router(
 
 app.include_router(
     task_router, 
+    prefix="/api/v1")
+
+app.include_router(
+    auth_router, 
     prefix="/api/v1")
 
 

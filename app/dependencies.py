@@ -10,6 +10,8 @@ from app.repositories.project import ProjectRepository
 from app.repositories.task import TaskRepository
 from app.services.project import ProjectService
 from app.services.task import TaskService
+from app.repositories.refresh_token import RefreshTokenRepository
+from app.services.auth import AuthService
 
 
 def get_user_repository(
@@ -58,3 +60,19 @@ def get_task_service(
     repository: TaskRepository = Depends(get_task_repository),
 ):
     return TaskService(repository)
+
+def get_refresh_token_repository(
+    db: AsyncSession = Depends(get_db),
+):
+    return RefreshTokenRepository(db)
+
+def get_auth_service(
+    user_repository: UserRepository = Depends(get_user_repository),
+    refresh_token_repository: RefreshTokenRepository = Depends(
+        get_refresh_token_repository
+    ),
+):
+    return AuthService(
+        user_repository=user_repository,
+        refresh_token_repository=refresh_token_repository,
+    )

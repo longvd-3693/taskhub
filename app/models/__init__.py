@@ -6,3 +6,4 @@ from app.models.task import Task
 from app.models.label import Label
 from app.models.task_label import task_labels
 from app.models.comment import Comment
+from app.models.refresh_token import RefreshToken
