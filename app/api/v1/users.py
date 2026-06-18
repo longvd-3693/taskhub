@@ -14,6 +14,7 @@ from app.schemas.user import (
 from app.services.user import UserService
 from app.auth.dependencies import get_current_user
 from app.models.user import User
+from app.auth.dependencies import require_admin
 
 
 router = APIRouter(
@@ -107,20 +108,19 @@ async def update_user(
 
 @router.delete(
     "/{user_id}",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_user(
     user_id: int,
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(require_admin),
 ):
-    success = await service.delete_user(
-        user_id
-    )
+    success = await service.delete_user(user_id)
 
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
+            detail="User not found",
         )
 
     return None

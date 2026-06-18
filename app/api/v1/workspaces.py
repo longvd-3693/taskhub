@@ -1,13 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.dependencies import get_workspace_service
+from app.dependencies import (
+    get_workspace_member_service,
+    get_workspace_service,
+)
+from app.models.workspace import Workspace
+from app.permissions.workspace import require_workspace_owner
 from app.schemas.workspace import (
     WorkspaceCreate,
-    WorkspaceUpdate,
     WorkspaceResponse,
 )
+from app.schemas.workspace_member import (
+    WorkspaceMemberCreate,
+    WorkspaceMemberResponse,
+)
 from app.services.workspace import WorkspaceService
-
+from app.services.workspace_member import WorkspaceMemberService
 
 router = APIRouter(
     prefix="/workspaces",
@@ -25,18 +33,6 @@ async def create_workspace(
     service: WorkspaceService = Depends(get_workspace_service),
 ):
     return await service.create_workspace(request.model_dump())
-
-
-@router.get(
-    "",
-    response_model=list[WorkspaceResponse],
-)
-async def get_workspaces(
-    page: int = 1,
-    limit: int = 20,
-    service: WorkspaceService = Depends(get_workspace_service),
-):
-    return await service.get_workspaces(page=page, limit=limit)
 
 
 @router.get(
@@ -58,43 +54,49 @@ async def get_workspace(
     return workspace
 
 
-@router.patch(
-    "/{workspace_id}",
-    response_model=WorkspaceResponse,
+@router.post(
+    "/{workspace_id}/members",
+    response_model=WorkspaceMemberResponse,
+    status_code=status.HTTP_201_CREATED,
 )
-async def update_workspace(
-    workspace_id: int,
-    request: WorkspaceUpdate,
-    service: WorkspaceService = Depends(get_workspace_service),
+async def add_workspace_member(
+    request: WorkspaceMemberCreate,
+    workspace: Workspace = Depends(require_workspace_owner),
+    service: WorkspaceMemberService = Depends(get_workspace_member_service),
 ):
-    workspace = await service.update_workspace(
-        workspace_id,
-        request.model_dump(exclude_none=True),
+    member = await service.add_member(
+        workspace_id=workspace.id,
+        user_id=request.user_id,
+        role=request.role,
     )
 
-    if workspace is None:
+    if member is None:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found",
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User is already a workspace member",
         )
 
-    return workspace
+    return member
 
 
 @router.delete(
-    "/{workspace_id}",
+    "/{workspace_id}/members/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete_workspace(
-    workspace_id: int,
-    service: WorkspaceService = Depends(get_workspace_service),
+async def remove_workspace_member(
+    user_id: int,
+    workspace: Workspace = Depends(require_workspace_owner),
+    service: WorkspaceMemberService = Depends(get_workspace_member_service),
 ):
-    success = await service.delete_workspace(workspace_id)
+    success = await service.remove_member(
+        workspace_id=workspace.id,
+        user_id=user_id,
+    )
 
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found",
+            detail="Workspace member not found or cannot remove owner",
         )
 
     return None

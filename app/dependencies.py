@@ -12,6 +12,9 @@ from app.services.project import ProjectService
 from app.services.task import TaskService
 from app.repositories.refresh_token import RefreshTokenRepository
 from app.services.auth import AuthService
+from app.repositories.workspace_member import WorkspaceMemberRepository
+from app.services.workspace_member import WorkspaceMemberService
+
 
 
 def get_user_repository(
@@ -31,11 +34,6 @@ def get_workspace_repository(
 ):
     return WorkspaceRepository(db)
 
-
-def get_workspace_service(
-    repository: WorkspaceRepository = Depends(get_workspace_repository),
-):
-    return WorkspaceService(repository)
 
 
 def get_project_repository(
@@ -76,3 +74,28 @@ def get_auth_service(
         user_repository=user_repository,
         refresh_token_repository=refresh_token_repository,
     )
+
+
+def get_workspace_member_repository(
+    db: AsyncSession = Depends(get_db),
+):
+    return WorkspaceMemberRepository(db)
+
+
+def get_workspace_service(
+    repository: WorkspaceRepository = Depends(get_workspace_repository),
+    member_repository: WorkspaceMemberRepository = Depends(
+        get_workspace_member_repository
+    ),
+):
+    return WorkspaceService(
+        repository=repository,
+        member_repository=member_repository,
+    )
+
+def get_workspace_member_service(
+    repository: WorkspaceMemberRepository = Depends(
+        get_workspace_member_repository
+    ),
+):
+    return WorkspaceMemberService(repository)
