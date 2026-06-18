@@ -2,13 +2,16 @@ from fastapi import APIRouter, Depends, Query, status
 
 from app.auth.dependencies import get_current_active_user
 from app.dependencies import get_task_service
+from app.models.project import Project
 from app.models.task import Task
 from app.models.user import User
+from app.permissions.project import (
+    require_project_editor,
+    require_project_member,
+)
 from app.permissions.task import require_task_editor
 from app.schemas.task import TaskCreate, TaskResponse, TaskUpdate
 from app.services.task import TaskService
-from app.permissions.project import require_project_member, require_project_editor
-from app.models.project import Project
 
 
 router = APIRouter(
@@ -21,7 +24,6 @@ router = APIRouter(
     response_model=list[TaskResponse],
 )
 async def get_project_tasks(
-    project_id: int,
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
     project: Project = Depends(require_project_member),
@@ -43,9 +45,9 @@ async def create_task(
     request: TaskCreate,
     project: Project = Depends(require_project_editor),
     current_user: User = Depends(get_current_active_user),
-    task_service: TaskService = Depends(get_task_service),
+    service: TaskService = Depends(get_task_service),
 ):
-    return await task_service.create_task(
+    return await service.create_task(
         project_id=project.id,
         created_by=current_user.id,
         data=request.model_dump(),

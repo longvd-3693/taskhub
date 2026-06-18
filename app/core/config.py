@@ -15,6 +15,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+    redis_url: str
+    task_cache_ttl: int = 300
 
 
 settings = Settings()

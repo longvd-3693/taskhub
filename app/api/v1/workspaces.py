@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from app.dependencies import (
     get_workspace_member_service,
@@ -16,6 +16,10 @@ from app.schemas.workspace_member import (
 )
 from app.services.workspace import WorkspaceService
 from app.services.workspace_member import WorkspaceMemberService
+from app.exceptions.exceptions import (
+    ConflictException,
+    WorkspaceNotFound,
+)
 
 router = APIRouter(
     prefix="/workspaces",
@@ -46,10 +50,7 @@ async def get_workspace(
     workspace = await service.get_workspace(workspace_id)
 
     if workspace is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found",
-        )
+        raise WorkspaceNotFound()
 
     return workspace
 
@@ -71,10 +72,7 @@ async def add_workspace_member(
     )
 
     if member is None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="User is already a workspace member",
-        )
+        raise ConflictException("User is already a workspace member")
 
     return member
 
@@ -94,9 +92,6 @@ async def remove_workspace_member(
     )
 
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace member not found or cannot remove owner",
-        )
+        raise WorkspaceNotFound("Workspace member not found or cannot remove owner")
 
     return None

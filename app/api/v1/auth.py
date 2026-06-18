@@ -1,7 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app.dependencies import get_auth_service
+from app.exceptions.exceptions import (
+    AuthenticationFailed,
+    EmailAlreadyExists,
+    InvalidRefreshToken,
+    RefreshTokenNotFound,
+)
 from app.schemas.auth import (
     LogoutRequest,
     RefreshTokenRequest,
@@ -26,15 +32,10 @@ async def register(
     request: UserCreate,
     service: AuthService = Depends(get_auth_service),
 ):
-    user = await service.register(
-        request.model_dump()
-    )
+    user = await service.register(request.model_dump())
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Email already exists",
-        )
+        raise EmailAlreadyExists()
 
     return user
 
@@ -53,10 +54,7 @@ async def login(
     )
 
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid email or password",
-        )
+        raise AuthenticationFailed()
 
     return token
 
@@ -69,15 +67,10 @@ async def refresh(
     request: RefreshTokenRequest,
     service: AuthService = Depends(get_auth_service),
 ):
-    token = await service.refresh(
-        request.refresh_token
-    )
+    token = await service.refresh(request.refresh_token)
 
     if token is None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token",
-        )
+        raise InvalidRefreshToken()
 
     return token
 
@@ -87,16 +80,11 @@ async def logout(
     request: LogoutRequest,
     service: AuthService = Depends(get_auth_service),
 ):
-    success = await service.logout(
-        request.refresh_token
-    )
+    success = await service.logout(request.refresh_token)
 
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Refresh token not found",
-        )
+        raise RefreshTokenNotFound()
 
     return {
-        "message": "Logged out successfully"
+        "message": "Logged out successfully",
     }
