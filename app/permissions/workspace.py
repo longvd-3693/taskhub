@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 
 from app.auth.dependencies import get_current_active_user
 from app.dependencies import get_workspace_member_service, get_workspace_service
@@ -6,6 +6,10 @@ from app.models.enums import WorkspaceMemberRole
 from app.models.user import User
 from app.models.workspace import Workspace
 from app.services.workspace import WorkspaceService
+from app.exceptions.exceptions import (
+    WorkspaceNotFound,
+    WorkspacePermissionDenied,
+)
 from app.services.workspace_member import WorkspaceMemberService
 
 
@@ -18,10 +22,7 @@ async def require_workspace_owner(
     workspace = await workspace_service.get_workspace(workspace_id)
 
     if workspace is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found",
-        )
+        raise WorkspaceNotFound()
 
     member = await member_service.repository.get_member(
         workspace_id=workspace_id,
@@ -29,9 +30,8 @@ async def require_workspace_owner(
     )
 
     if member is None or member.role != WorkspaceMemberRole.OWNER:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Workspace owner permission required",
+        raise WorkspacePermissionDenied(
+            "Workspace owner permission required",
         )
 
     return workspace

@@ -1,7 +1,11 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 
 from app.auth.dependencies import get_current_active_user
 from app.dependencies import get_workspace_member_service, get_workspace_service
+from app.exceptions.exceptions import (
+    WorkspaceNotFound,
+    WorkspacePermissionDenied,
+)
 from app.models.enums import WorkspaceMemberRole
 from app.models.user import User
 from app.services.workspace import WorkspaceService
@@ -17,23 +21,19 @@ async def require_workspace_editor(
     workspace = await workspace_service.get_workspace(workspace_id)
 
     if workspace is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Workspace not found",
-        )
+        raise WorkspaceNotFound()
 
     member = await member_service.repository.get_member(
         workspace_id=workspace_id,
         user_id=current_user.id,
     )
 
-    if member is None or member.role not in [
+    if member is None or member.role not in (
         WorkspaceMemberRole.OWNER,
         WorkspaceMemberRole.EDITOR,
-    ]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Workspace editor permission required",
+    ):
+        raise WorkspacePermissionDenied(
+            "Workspace editor permission required"
         )
 
     return current_user

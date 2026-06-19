@@ -1,20 +1,15 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    status
-)
+from fastapi import APIRouter, Depends, status
 
+from app.auth.dependencies import get_current_user, require_admin
 from app.dependencies import get_user_service
+from app.exceptions.exceptions import UserNotFound
+from app.models.user import User
 from app.schemas.user import (
     UserCreate,
+    UserResponse,
     UserUpdate,
-    UserResponse
 )
 from app.services.user import UserService
-from app.auth.dependencies import get_current_user
-from app.models.user import User
-from app.auth.dependencies import require_admin
 
 
 router = APIRouter(
@@ -73,10 +68,7 @@ async def get_user(
     user = await service.get_user(user_id)
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise UserNotFound()
 
     return user
 
@@ -88,7 +80,7 @@ async def get_user(
 async def update_user(
     user_id: int,
     request: UserUpdate,
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
 ):
     user = await service.update_user(
         user_id,
@@ -98,10 +90,7 @@ async def update_user(
     )
 
     if user is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found"
-        )
+        raise UserNotFound()
 
     return user
 
@@ -118,9 +107,6 @@ async def delete_user(
     success = await service.delete_user(user_id)
 
     if not success:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found",
-        )
+        raise UserNotFound()
 
     return None

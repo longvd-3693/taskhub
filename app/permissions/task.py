@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 
 from app.auth.dependencies import get_current_active_user
 from app.dependencies import get_task_service
@@ -6,6 +6,10 @@ from app.models.enums import WorkspaceMemberRole
 from app.models.task import Task
 from app.models.user import User
 from app.services.task import TaskService
+from app.exceptions.exceptions import (
+    TaskNotFound,
+    TaskPermissionDenied,
+)
 
 
 async def require_task_editor(
@@ -16,10 +20,7 @@ async def require_task_editor(
     task = await task_service.get_task_with_project_workspace(task_id)
 
     if task is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Task not found",
-        )
+        raise TaskNotFound()
 
     member = next(
         (
@@ -34,9 +35,8 @@ async def require_task_editor(
         WorkspaceMemberRole.OWNER,
         WorkspaceMemberRole.EDITOR,
     ]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Task editor permission required",
+        raise TaskPermissionDenied(
+            "Task editor permission required",
         )
 
     return task

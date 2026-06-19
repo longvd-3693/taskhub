@@ -1,5 +1,8 @@
 from contextlib import asynccontextmanager
 
+from app.core.redis import close_redis
+
+
 
 @asynccontextmanager
 async def lifespan(app):
@@ -8,3 +11,4 @@ async def lifespan(app):
     yield
 
     print("🛑 TaskHub is shutting down...")
+    await close_redis()

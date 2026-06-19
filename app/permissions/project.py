@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends
 
 from app.auth.dependencies import get_current_active_user
 from app.dependencies import get_project_service
@@ -6,6 +6,10 @@ from app.models.enums import WorkspaceMemberRole
 from app.models.project import Project
 from app.models.user import User
 from app.services.project import ProjectService
+from app.exceptions.exceptions import (
+    ProjectNotFound,
+    ProjectPermissionDenied,
+)
 
 
 async def _get_project_member(
@@ -16,10 +20,7 @@ async def _get_project_member(
     project = await project_service.get_project_with_workspace(project_id)
 
     if project is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Project not found",
-        )
+        raise ProjectNotFound()
 
     member = next(
         (
@@ -31,10 +32,7 @@ async def _get_project_member(
     )
 
     if member is None:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Workspace member permission required",
-        )
+        raise ProjectPermissionDenied("Workspace member permission required")
 
     return project, member.role
 
@@ -68,9 +66,6 @@ async def require_project_editor(
         WorkspaceMemberRole.OWNER,
         WorkspaceMemberRole.EDITOR,
     ):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Project editor permission required",
-        )
+        raise ProjectPermissionDenied("Project editor permission required")
 
     return project

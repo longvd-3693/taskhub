@@ -1,8 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from app.dependencies import get_project_service
 from app.models.project import Project
-from app.permissions.project import require_project_editor
+from app.permissions.project import (
+    require_project_editor,
+    require_project_member,
+)
 from app.permissions.workspace_member import require_workspace_editor
 from app.schemas.project import (
     ProjectCreate,
@@ -10,9 +13,6 @@ from app.schemas.project import (
     ProjectUpdate,
 )
 from app.services.project import ProjectService
-from app.permissions.project import (
-    require_project_member,
-)
 
 router = APIRouter(
     tags=["Projects"],
@@ -41,17 +41,8 @@ async def create_project(
     response_model=ProjectResponse,
 )
 async def get_project(
-    project_id: int,
-    service: ProjectService = Depends(require_project_member),
+    project: Project = Depends(require_project_member),
 ):
-    project = await service.get_project(project_id)
-
-    if project is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Project not found",
-        )
-
     return project
 
 
