@@ -21,7 +21,14 @@ router = APIRouter(
 @router.post(
     "",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
+    summary="Create User",
+    description="Create a new user account.",
+    responses={
+        201: {"description": "User successfully created"},
+        409: {"description": "User already exists"},
+        422: {"description": "Validation error"},
+    },
 )
 async def create_user(
     request: UserCreate,
@@ -34,7 +41,9 @@ async def create_user(
 
 @router.get(
     "",
-    response_model=list[UserResponse]
+    response_model=list[UserResponse],
+    summary="List Users",
+    description="Retrieve a paginated list of all users.",
 )
 async def get_users(
     page: int = 1,
@@ -50,6 +59,12 @@ async def get_users(
 @router.get(
     "/me",
     response_model=UserResponse,
+    summary="Get Current User",
+    description="Retrieve the authenticated user's profile information.",
+    responses={
+        200: {"description": "Current user information"},
+        401: {"description": "Unauthorized"},
+    },
 )
 async def get_me(
     current_user: User = Depends(get_current_user),
@@ -59,7 +74,13 @@ async def get_me(
 
 @router.get(
     "/{user_id}",
-    response_model=UserResponse
+    response_model=UserResponse,
+    summary="Get User",
+    description="Retrieve a user by ID.",
+    responses={
+        200: {"description": "User found"},
+        404: {"description": "User not found"},
+    },
 )
 async def get_user(
     user_id: int,
@@ -75,7 +96,14 @@ async def get_user(
 
 @router.patch(
     "/{user_id}",
-    response_model=UserResponse
+    response_model=UserResponse,
+    summary="Update User",
+    description="Update user information by ID.",
+    responses={
+        200: {"description": "User updated successfully"},
+        404: {"description": "User not found"},
+        422: {"description": "Validation error"},
+    },
 )
 async def update_user(
     user_id: int,
@@ -98,6 +126,14 @@ async def update_user(
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Delete User",
+    description="Delete a user by ID (admin only).",
+    responses={
+        204: {"description": "User deleted successfully"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Insufficient permissions (admin required)"},
+        404: {"description": "User not found"},
+    },
 )
 async def delete_user(
     user_id: int,

@@ -17,10 +17,34 @@ from app.exceptions.handlers import (
     validation_exception_handler,
 )
 
+
+
+description = """
+TaskHub is a task management API built with FastAPI.
+
+Main features:
+
+- JWT authentication
+- Refresh token and logout
+- Role-based access control
+- Workspace, project and task management
+- Redis caching for project tasks
+- Centralized exception handling
+"""
+
+
 app = FastAPI(
     title="TaskHub API",
+    description=description,
     version="1.0.0",
-    lifespan=lifespan
+    contact={
+        "name": "TaskHub Backend Team",
+        "email": "support@taskhub.com",
+    },
+    license_info={
+        "name": "MIT",
+    },
+    lifespan=lifespan,
 )
 
 app.add_exception_handler(

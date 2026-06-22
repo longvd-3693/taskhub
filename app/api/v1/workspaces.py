@@ -31,6 +31,12 @@ router = APIRouter(
     "",
     response_model=WorkspaceResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Create Workspace",
+    description="Create a new workspace.",
+    responses={
+        201: {"description": "Workspace successfully created"},
+        422: {"description": "Validation error"},
+    },
 )
 async def create_workspace(
     request: WorkspaceCreate,
@@ -42,6 +48,12 @@ async def create_workspace(
 @router.get(
     "/{workspace_id}",
     response_model=WorkspaceResponse,
+    summary="Get Workspace",
+    description="Retrieve a workspace by ID.",
+    responses={
+        200: {"description": "Workspace found"},
+        404: {"description": "Workspace not found"},
+    },
 )
 async def get_workspace(
     workspace_id: int,
@@ -59,6 +71,16 @@ async def get_workspace(
     "/{workspace_id}/members",
     response_model=WorkspaceMemberResponse,
     status_code=status.HTTP_201_CREATED,
+    summary="Add Workspace Member",
+    description="Add a new member to a workspace (owner only).",
+    responses={
+        201: {"description": "Member successfully added"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Insufficient permissions (owner required)"},
+        404: {"description": "Workspace not found"},
+        409: {"description": "User is already a workspace member"},
+        422: {"description": "Validation error"},
+    },
 )
 async def add_workspace_member(
     request: WorkspaceMemberCreate,
@@ -80,6 +102,14 @@ async def add_workspace_member(
 @router.delete(
     "/{workspace_id}/members/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    summary="Remove Workspace Member",
+    description="Remove a member from a workspace (owner only).",
+    responses={
+        204: {"description": "Member successfully removed"},
+        401: {"description": "Unauthorized"},
+        403: {"description": "Insufficient permissions (owner required)"},
+        404: {"description": "Workspace or member not found"},
+    },
 )
 async def remove_workspace_member(
     user_id: int,
