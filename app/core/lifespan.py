@@ -1,14 +1,19 @@
+import logging
 from contextlib import asynccontextmanager
 
+from app.core.logging import configure_logging
 from app.core.redis import close_redis
 
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app):
-    print("🚀 TaskHub is starting...")
+    configure_logging()
+    logger.info("TaskHub application started")
 
     yield
 
-    print("🛑 TaskHub is shutting down...")
+    logger.info("TaskHub application stopped")
     await close_redis()
