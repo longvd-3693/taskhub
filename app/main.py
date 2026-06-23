@@ -18,7 +18,6 @@ from app.exceptions.handlers import (
 )
 
 
-
 description = """
 TaskHub is a task management API built with FastAPI.
 
