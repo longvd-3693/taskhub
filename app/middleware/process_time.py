@@ -4,7 +4,6 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class ProcessTimeMiddleware(BaseHTTPMiddleware):
-
     async def dispatch(
         self,
         request,
@@ -16,8 +15,6 @@ class ProcessTimeMiddleware(BaseHTTPMiddleware):
 
         process_time = time.perf_counter() - start_time
 
-        response.headers["X-Process-Time"] = str(
-            round(process_time, 4)
-        )
+        response.headers["X-Process-Time"] = str(round(process_time, 4))
 
         return response

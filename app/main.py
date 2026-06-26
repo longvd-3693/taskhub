@@ -66,10 +66,7 @@ app.add_middleware(ProcessTimeMiddleware)
 app.add_middleware(RequestIdMiddleware)
 
 
-app.include_router(
-    user_router,
-    prefix="/api/v1"
-)
+app.include_router(user_router, prefix="/api/v1")
 
 
 app.include_router(
@@ -78,22 +75,14 @@ app.include_router(
 )
 
 
-app.include_router(
-    project_router, 
-    prefix="/api/v1")
+app.include_router(project_router, prefix="/api/v1")
 
 
-app.include_router(
-    task_router, 
-    prefix="/api/v1")
+app.include_router(task_router, prefix="/api/v1")
 
-app.include_router(
-    auth_router, 
-    prefix="/api/v1")
+app.include_router(auth_router, prefix="/api/v1")
 
 
 @app.get("/")
 def root():
-    return {
-        "message": "TaskHub API is running"
-    }
+    return {"message": "TaskHub API is running"}

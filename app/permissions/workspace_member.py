@@ -32,8 +32,6 @@ async def require_workspace_editor(
         WorkspaceMemberRole.OWNER,
         WorkspaceMemberRole.EDITOR,
     ):
-        raise WorkspacePermissionDenied(
-            "Workspace editor permission required"
-        )
+        raise WorkspacePermissionDenied("Workspace editor permission required")
 
     return current_user

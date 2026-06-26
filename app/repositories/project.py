@@ -8,7 +8,6 @@ from app.repositories.base import BaseRepository
 
 
 class ProjectRepository(BaseRepository[Project]):
-
     def __init__(self, session: AsyncSession):
         super().__init__(session, Project)
 
@@ -18,10 +17,7 @@ class ProjectRepository(BaseRepository[Project]):
     ) -> Project | None:
         result = await self.session.execute(
             select(Project)
-            .options(
-                selectinload(Project.workspace)
-                .selectinload(Workspace.members)
-            )
+            .options(selectinload(Project.workspace).selectinload(Workspace.members))
             .where(Project.id == project_id)
         )
 

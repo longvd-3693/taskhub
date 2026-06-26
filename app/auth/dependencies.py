@@ -8,9 +8,7 @@ from app.services.user import UserService
 from app.models.enums import UserRole
 
 
-oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/api/v1/auth/login"
-)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
 async def get_current_user(
@@ -24,12 +22,12 @@ async def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid token",
         )
-    
+
     if payload.get("type") != "access":
-         raise HTTPException(
-             status_code=status.HTTP_401_UNAUTHORIZED,
-             detail="Invalid token",
-         )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token",
+        )
 
     user_id = payload.get("sub")
 
@@ -48,6 +46,7 @@ async def get_current_user(
         )
 
     return user
+
 
 async def get_current_active_user(
     current_user: User = Depends(get_current_user),

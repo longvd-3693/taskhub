@@ -9,7 +9,6 @@ from app.repositories.user import UserRepository
 
 
 class AuthService:
-
     def __init__(
         self,
         user_repository: UserRepository,
@@ -22,16 +21,12 @@ class AuthService:
         self,
         data: dict,
     ):
-        existing_user = await self.user_repository.get_by_email(
-            data["email"]
-        )
+        existing_user = await self.user_repository.get_by_email(data["email"])
 
         if existing_user is not None:
             return None
 
-        data["hashed_password"] = hash_password(
-            data.pop("password")
-        )
+        data["hashed_password"] = hash_password(data.pop("password"))
 
         return await self.user_repository.create(data)
 
@@ -51,13 +46,9 @@ class AuthService:
         ):
             return None
 
-        access_token = create_access_token(
-            str(user.id)
-        )
+        access_token = create_access_token(str(user.id))
 
-        refresh_token = create_refresh_token(
-            str(user.id)
-        )
+        refresh_token = create_refresh_token(str(user.id))
 
         await self.refresh_token_repository.create(
             {
@@ -96,26 +87,20 @@ class AuthService:
         if user_id is None:
             return None
 
-        user = await self.user_repository.get_by_id(
-            int(user_id)
-        )
+        user = await self.user_repository.get_by_id(int(user_id))
 
         if user is None:
             return None
 
-        new_access_token = create_access_token(
-            str(user.id)
-        )
+        new_access_token = create_access_token(str(user.id))
 
-        new_refresh_token = create_refresh_token(
-            str(user.id)
-        )
+        new_refresh_token = create_refresh_token(str(user.id))
 
         await self.refresh_token_repository.update(
             stored_token,
             {
                 "is_revoked": True,
-            }
+            },
         )
 
         await self.refresh_token_repository.create(
@@ -146,7 +131,7 @@ class AuthService:
             stored_token,
             {
                 "is_revoked": True,
-            }
+            },
         )
 
         return True

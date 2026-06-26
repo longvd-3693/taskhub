@@ -12,76 +12,38 @@ class Task(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id"),
-        nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
 
     assignee_id: Mapped[int | None] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=True
+        ForeignKey("users.id"), nullable=True
     )
 
-    title: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    description: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True
-    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    status: Mapped[str] = mapped_column(
-        String(50),
-        default="TODO"
-    )
+    status: Mapped[str] = mapped_column(String(50), default="TODO")
 
-    priority: Mapped[str] = mapped_column(
-        String(50),
-        default="MEDIUM"
-    )
+    priority: Mapped[str] = mapped_column(String(50), default="MEDIUM")
 
-    due_date: Mapped[datetime | None] = mapped_column(
-        DateTime,
-        nullable=True
-    )
+    due_date: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
-    created_by: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=False
-    )
+    created_by: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    project = relationship(
-        "Project",
-        back_populates="tasks"
-    )
+    project = relationship("Project", back_populates="tasks")
 
     assignee = relationship(
-        "User",
-        back_populates="assigned_tasks",
-        foreign_keys=[assignee_id]
+        "User", back_populates="assigned_tasks", foreign_keys=[assignee_id]
     )
 
     creator = relationship(
-        "User",
-        back_populates="created_tasks",
-        foreign_keys=[created_by]
+        "User", back_populates="created_tasks", foreign_keys=[created_by]
     )
 
-    labels = relationship(
-        "Label",
-        secondary=task_labels,
-        back_populates="tasks"
-    )
+    labels = relationship("Label", secondary=task_labels, back_populates="tasks")
 
     comments = relationship(
-        "Comment",
-        back_populates="task",
-        cascade="all, delete-orphan"
+        "Comment", back_populates="task", cascade="all, delete-orphan"
     )

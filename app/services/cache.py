@@ -4,7 +4,6 @@ from app.core.redis import redis_client
 
 
 class CacheService:
-
     async def get(self, key: str):
         value = await redis_client.get(key)
 

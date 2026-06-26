@@ -6,7 +6,6 @@ from app.repositories.base import BaseRepository
 
 
 class WorkspaceMemberRepository(BaseRepository[WorkspaceMember]):
-
     def __init__(self, session: AsyncSession):
         super().__init__(session, WorkspaceMember)
 

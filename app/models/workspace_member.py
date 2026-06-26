@@ -27,5 +27,5 @@ class WorkspaceMember(Base):
         "Workspace",
         back_populates="members",
     )
-    
+
     user = relationship("User")

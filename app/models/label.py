@@ -10,28 +10,12 @@ class Label(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    project_id: Mapped[int] = mapped_column(
-        ForeignKey("projects.id"),
-        nullable=False
-    )
+    project_id: Mapped[int] = mapped_column(ForeignKey("projects.id"), nullable=False)
 
-    name: Mapped[str] = mapped_column(
-        String(100),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column(String(100), nullable=False)
 
-    color: Mapped[str] = mapped_column(
-        String(50),
-        nullable=False
-    )
+    color: Mapped[str] = mapped_column(String(50), nullable=False)
 
-    project = relationship(
-        "Project",
-        back_populates="labels"
-    )
+    project = relationship("Project", back_populates="labels")
 
-    tasks = relationship(
-        "Task",
-        secondary=task_labels,
-        back_populates="labels"
-    )
+    tasks = relationship("Task", secondary=task_labels, back_populates="labels")

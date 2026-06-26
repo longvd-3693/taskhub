@@ -4,7 +4,6 @@ from app.repositories.project import ProjectRepository
 
 
 class ProjectService:
-
     def __init__(self, repository: ProjectRepository):
         self.repository = repository
 

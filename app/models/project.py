@@ -12,43 +12,21 @@ class Project(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
 
     workspace_id: Mapped[int] = mapped_column(
-        ForeignKey("workspaces.id"),
-        nullable=False
+        ForeignKey("workspaces.id"), nullable=False
     )
 
-    name: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    description: Mapped[str | None] = mapped_column(
-        Text,
-        nullable=True
-    )
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    status: Mapped[str] = mapped_column(
-        String(50),
-        default="ACTIVE"
-    )
+    status: Mapped[str] = mapped_column(String(50), default="ACTIVE")
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    workspace = relationship(
-        "Workspace",
-        back_populates="projects"
-    )
+    workspace = relationship("Workspace", back_populates="projects")
 
-    tasks = relationship(
-        "Task",
-        back_populates="project",
-        cascade="all, delete-orphan"
-    )
+    tasks = relationship("Task", back_populates="project", cascade="all, delete-orphan")
 
     labels = relationship(
-        "Label",
-        back_populates="project",
-        cascade="all, delete-orphan"
+        "Label", back_populates="project", cascade="all, delete-orphan"
     )

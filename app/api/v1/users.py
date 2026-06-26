@@ -12,10 +12,7 @@ from app.schemas.user import (
 from app.services.user import UserService
 
 
-router = APIRouter(
-    prefix="/users",
-    tags=["Users"]
-)
+router = APIRouter(prefix="/users", tags=["Users"])
 
 
 @router.post(
@@ -31,12 +28,9 @@ router = APIRouter(
     },
 )
 async def create_user(
-    request: UserCreate,
-    service: UserService = Depends(get_user_service)
+    request: UserCreate, service: UserService = Depends(get_user_service)
 ):
-    return await service.create_user(
-        request.model_dump()
-    )
+    return await service.create_user(request.model_dump())
 
 
 @router.get(
@@ -46,14 +40,9 @@ async def create_user(
     description="Retrieve a paginated list of all users.",
 )
 async def get_users(
-    page: int = 1,
-    limit: int = 20,
-    service: UserService = Depends(get_user_service)
+    page: int = 1, limit: int = 20, service: UserService = Depends(get_user_service)
 ):
-    return await service.get_users(
-        page=page,
-        limit=limit
-    )
+    return await service.get_users(page=page, limit=limit)
 
 
 @router.get(
@@ -82,10 +71,7 @@ async def get_me(
         404: {"description": "User not found"},
     },
 )
-async def get_user(
-    user_id: int,
-    service: UserService = Depends(get_user_service)
-):
+async def get_user(user_id: int, service: UserService = Depends(get_user_service)):
     user = await service.get_user(user_id)
 
     if user is None:
@@ -110,12 +96,7 @@ async def update_user(
     request: UserUpdate,
     service: UserService = Depends(get_user_service),
 ):
-    user = await service.update_user(
-        user_id,
-        request.model_dump(
-            exclude_none=True
-        )
-    )
+    user = await service.update_user(user_id, request.model_dump(exclude_none=True))
 
     if user is None:
         raise UserNotFound()
