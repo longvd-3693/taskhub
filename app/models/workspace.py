@@ -11,34 +11,20 @@ class Workspace(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
-    name: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    owner_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id"),
-        nullable=False
-    )
+    owner_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
-    owner = relationship(
-        "User",
-        back_populates="workspaces"
-    )
+    owner = relationship("User", back_populates="workspaces")
 
     projects = relationship(
-        "Project",
-        back_populates="workspace",
-        cascade="all, delete-orphan"
+        "Project", back_populates="workspace", cascade="all, delete-orphan"
     )
 
     members = relationship(
-    "WorkspaceMember",
-    back_populates="workspace",
-    cascade="all, delete-orphan",
-)
+        "WorkspaceMember",
+        back_populates="workspace",
+        cascade="all, delete-orphan",
+    )

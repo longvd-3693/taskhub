@@ -16,6 +16,7 @@ workspace_member_role_enum = postgresql.ENUM(
     "EDITOR",
     "VIEWER",
     name="workspacememberrole",
+    create_type=False,
 )
 
 

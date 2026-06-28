@@ -13,21 +13,12 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
 
     email: Mapped[str] = mapped_column(
-        String(255),
-        unique=True,
-        nullable=False,
-        index=True
+        String(255), unique=True, nullable=False, index=True
     )
 
-    full_name: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
 
-    hashed_password: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
+    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
 
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole),
@@ -35,35 +26,20 @@ class User(Base):
         nullable=False,
     )
 
-    is_active: Mapped[bool] = mapped_column(
-        Boolean,
-        default=True
-    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
     workspaces = relationship(
-        "Workspace",
-        back_populates="owner",
-        cascade="all, delete-orphan"
+        "Workspace", back_populates="owner", cascade="all, delete-orphan"
     )
 
     assigned_tasks = relationship(
-        "Task",
-        back_populates="assignee",
-        foreign_keys="Task.assignee_id"
+        "Task", back_populates="assignee", foreign_keys="Task.assignee_id"
     )
 
     created_tasks = relationship(
-        "Task",
-        back_populates="creator",
-        foreign_keys="Task.created_by"
+        "Task", back_populates="creator", foreign_keys="Task.created_by"
     )
 
-    comments = relationship(
-        "Comment",
-        back_populates="author"
-    )
+    comments = relationship("Comment", back_populates="author")

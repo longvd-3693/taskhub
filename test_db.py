@@ -13,9 +13,7 @@ logger = logging.getLogger(__name__)
 
 async def main():
     async with SessionLocal() as session:
-        result = await session.execute(
-            text("SELECT version()")
-        )
+        result = await session.execute(text("SELECT version()"))
 
         logger.info(
             "Database version fetched",

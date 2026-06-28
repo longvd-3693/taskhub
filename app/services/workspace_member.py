@@ -3,7 +3,6 @@ from app.repositories.workspace_member import WorkspaceMemberRepository
 
 
 class WorkspaceMemberService:
-
     def __init__(
         self,
         repository: WorkspaceMemberRepository,

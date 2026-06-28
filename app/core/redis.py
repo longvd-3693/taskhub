@@ -11,4 +11,3 @@ redis_client = Redis.from_url(
 
 async def close_redis() -> None:
     await redis_client.aclose()
-    

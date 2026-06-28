@@ -9,7 +9,6 @@ from app.core.config import settings
 
 
 class TaskService:
-
     def __init__(self, repository: TaskRepository):
         self.repository = repository
         self.cache = CacheService()
@@ -34,9 +33,7 @@ class TaskService:
         self,
         project_id: int,
     ):
-        await self.cache.delete_by_pattern(
-            f"project:{project_id}:tasks:*"
-        )
+        await self.cache.delete_by_pattern(f"project:{project_id}:tasks:*")
 
     async def create_task(
         self,
@@ -71,7 +68,7 @@ class TaskService:
 
         if cached_tasks is not None:
             return cached_tasks
-        
+
         tasks = await self.repository.get_by_project(
             project_id=project_id,
             page=page,
@@ -79,8 +76,7 @@ class TaskService:
         )
 
         serialized_tasks = [
-            TaskResponse.model_validate(task).model_dump(mode="json")
-            for task in tasks
+            TaskResponse.model_validate(task).model_dump(mode="json") for task in tasks
         ]
 
         await self.cache.set(
